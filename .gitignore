@@ -30,8 +30,3 @@ public/style.css
 # https://github.com/creationix/nvm
 # Might unignore later
 .nvmrc
-
-# Prettier config
-# Might unignore later
-.prettierrc
-
