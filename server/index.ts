@@ -1,20 +1,11 @@
-import http = require('http')
+import { Server } from './server'
 
-const server = http.createServer((request, response) => {
-    request.setEncoding('utf8')
-    let body = ''
-    request.on('data', chunk => {
-        body += chunk
+const server = (new Server('8080'))
+    .route('GET', '/yee/{id:\\d+}', request => {
+        return request.routeParams!
     })
-    request.on('end', () => {
-        response.writeHead(200, 'OK')
-        response.end(body)
-    })
-})
+    .route('GET', '/yee', request => {
+        return '😎'
+    });
 
-const HTTP_HOST: string = process.env['HTTP_HOST'] || '127.0.0.1'
-const HTTP_PORT: string = process.env['HTTP_PORT'] || '8080'
-
-console.debug(`Listening on ${HTTP_HOST}:${HTTP_PORT}`)
-
-server.listen(parseInt(HTTP_PORT), HTTP_HOST)
+server.listen()

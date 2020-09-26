@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "baseUrl": ".",
-        "module": "commonjs",
+        "module": "CommonJS",
         "noEmit": true,
         "noImplicitAny": true,
         "noImplicitThis": true,
@@ -11,6 +11,9 @@
             "@client/*": [
                 "client/*"
             ],
+            "@common/*": [
+                "common/*"
+            ],
             "@server/*": [
                 "server/*"
             ]
@@ -19,11 +22,9 @@
         "target": "es2015"
     },
     "include": [
+        "common/**/*",
         "client/**/*",
         "server/**/*"
     ],
-    "exclude": [
-        "client/**/*.test.*",
-        "server/**/*.test.*"
-    ]
+    "exclude": []
 }
