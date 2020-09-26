@@ -2,29 +2,20 @@
     "compilerOptions": {
         "baseUrl": ".",
         "module": "CommonJS",
-        "noEmit": true,
+        "noEmit": false,
         "noImplicitAny": true,
         "noImplicitThis": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
         "paths": {
-            "@client/*": [
-                "client/*"
-            ],
-            "@common/*": [
-                "common/*"
-            ],
-            "@server/*": [
-                "server/*"
-            ]
+            "@client/*": ["client/*"],
+            "@common/*": ["common/*"],
+            "@server/*": ["server/*"]
         },
         "strict": true,
-        "target": "es2015"
+        "target": "es2015",
+        "jsx": "react"
     },
-    "include": [
-        "common/**/*",
-        "client/**/*",
-        "server/**/*"
-    ],
+    "include": ["common/**/*", "client/**/*", "server/**/*"],
     "exclude": []
 }
