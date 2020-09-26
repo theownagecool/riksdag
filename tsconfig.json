@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        "module": "commonjs",
+        "noEmit": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "paths": {
+            "@client/*": [
+                "client/*"
+            ],
+            "@server/*": [
+                "server/*"
+            ]
+        },
+        "strict": true,
+        "target": "es2015"
+    },
+    "include": [
+        "client/**/*",
+        "server/**/*"
+    ],
+    "exclude": [
+        "client/**/*.test.*",
+        "server/**/*.test.*"
+    ]
+}

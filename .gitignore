@@ -1,0 +1,37 @@
+# Folder view configuration files
+.DS_Store
+Desktop.ini
+
+# Thumbnail cache files
+._*
+Thumbs.db
+
+# Files that might appear on external disks
+.Spotlight-V100
+.Trashes
+
+/vendor
+/node_modules
+server/node_modules
+client/node_modules
+.env
+.env-test
+.env.testing
+
+.idea/
+.vscode/
+
+public/bundle.j
+public/*.map
+public/style.css
+/npm-debug.log
+
+# Node version manager
+# https://github.com/creationix/nvm
+# Might unignore later
+.nvmrc
+
+# Prettier config
+# Might unignore later
+.prettierrc
+
