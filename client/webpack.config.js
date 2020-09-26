@@ -20,6 +20,7 @@ const config = {
                     {
                         loader: 'ts-loader',
                         options: {
+                            configFile: path.resolve(__dirname, 'tsconfig.json'),
                             onlyCompileBundledFiles: true
                         }
                     }

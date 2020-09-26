@@ -1,6 +1,6 @@
 import http = require('http')
 import { Method, RouteHandler, Route, Match, Request } from './route'
-import { hasOwnProperty, Map } from '../common/util'
+import { hasOwnProperty, Map } from '@common/util'
 
 type RouteCollection<T extends Array<Route<any, any>>> = T
 

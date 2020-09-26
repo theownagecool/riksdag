@@ -1,4 +1,4 @@
-import { Map, toArray } from '../common/util'
+import { Map, toArray } from '@common/util'
 
 export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
 export type Request<M extends Method, P extends string> = {
