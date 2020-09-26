@@ -1,6 +1,6 @@
 export type Map<T> = { [key: string]: T }
-export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
-export type RouteLike<M extends Method, Path extends string, RequestBody = unknown, ResponseBody = unknown, Params = unknown> = {
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
+export type RouteLike<M extends HttpMethod, Path extends string, RequestBody = unknown, ResponseBody = unknown, Params = unknown> = {
     method: M
     path: Path
     requestBody: RequestBody
@@ -13,13 +13,30 @@ export enum Gender {
     Female = 1,
     Other = 2,
 }
+
 export type Person = {
     id?: number
-    given_name: string
     family_name: string
     gender: Gender
+    given_name: string
     party: string
+    source_id: string
     status: string
+    year_of_birth: number
+}
+
+export type RemotePersonResponse = {
+    personlista: {
+        person: ReadonlyArray<{
+            efternamn: string
+            fodd_ar: string
+            kon: string
+            parti: string
+            sourceid: string
+            status: string
+            tilltalsnamn: string
+        }>
+    }
 }
 
 export type Routes =

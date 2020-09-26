@@ -1,12 +1,12 @@
 import http = require('http')
 import { RouteHandler, Match, Request, Route } from './route'
-import { Method, RouteLike, Map } from '@common/types'
+import { HttpMethod, RouteLike, Map } from '@common/types'
 import { hasOwnProperty } from '@common/util'
 
 type FindMethods<T extends RouteLike<any, any>> = T['method']
-type FindRouteByMethod<T extends RouteLike<any, any>, M extends Method> =
+type FindRouteByMethod<T extends RouteLike<any, any>, M extends HttpMethod> =
     T extends { method: M } ? T : never
-type FindRoute<T extends RouteLike<any, any>, M extends Method, P extends string> =
+type FindRoute<T extends RouteLike<any, any>, M extends HttpMethod, P extends string> =
     T extends { method: M, path: P } ? T : never
 
 function tryParseJson<T extends string, D = undefined>(value: T, def?: D): object | D {
