@@ -37,7 +37,7 @@ const config = {
     ],
     resolve: {
         alias: {
-            '@client': path.resolve(__dirname)
+            '@client': path.resolve(__dirname, 'src')
         },
         extensions: ['.tsx', '.ts', '.js']
     },
