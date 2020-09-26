@@ -1,14 +1,11 @@
-import sqlite = require('sqlite3')
 import fs = require('fs')
 import path = require('path')
 import { Server } from './server'
 import { Gender, RemotePersonResponse, Routes } from '@common/types'
 import { NodeJSHttpClient } from './http'
-import { SQLite3Database } from './db'
+import { SQLite3Database } from './sqlite'
 
-const db = new SQLite3Database(
-    new sqlite.Database(':memory:')
-)
+const db = new SQLite3Database(':memory:')
 db.execute('PRAGMA foreign_keys = ON')
 const schema = fs.readFileSync(
     path.resolve(__dirname, '../../schema.sql'), 'utf8'
