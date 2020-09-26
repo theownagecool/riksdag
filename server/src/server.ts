@@ -1,13 +1,26 @@
 import http = require('http')
-import { Method, RouteHandler, Route, Match, Request } from './route'
-import { hasOwnProperty, Map } from '@common/util'
+import { RouteHandler, Match, Request, Route } from './route'
+import { Method, RouteLike, Map } from '@common/types'
+import { hasOwnProperty } from '@common/util'
 
-type RouteCollection<T extends Array<Route<any, any>>> = T
+type FindMethods<T extends RouteLike<any, any>> = T['method']
+type FindRouteByMethod<T extends RouteLike<any, any>, M extends Method> =
+    T extends { method: M } ? T : never
+type FindRoute<T extends RouteLike<any, any>, M extends Method, P extends string> =
+    T extends { method: M, path: P } ? T : never
 
-export class Server<T extends Array<Route<any, any>>> {
+function tryParseJson<T extends string, D = undefined>(value: T, def?: D): object | D {
+    try {
+        return JSON.parse(value)
+    } catch (e) {
+        return def!
+    }
+}
+
+export class Server<T extends RouteLike<any, any>> {
     protected readonly port: string
     protected readonly host: string
-    protected readonly routes: RouteCollection<T>
+    protected readonly routes: Array<Route<any>>
 
     constructor(port: string, host?: string) {
         this.port = port
@@ -15,8 +28,8 @@ export class Server<T extends Array<Route<any, any>>> {
         this.routes = [] as any
     }
 
-    public route<M extends Method, U extends string>(method: M, url: U, handler: RouteHandler<M, U>): Server<[...T, Route<M, U>]> {
-        this.routes.push(new Route(method, url, handler))
+    public route<M extends FindMethods<T>, P extends FindRouteByMethod<T, M>['path']>(method: M, path: P, handler: RouteHandler<FindRoute<T, M, P>>): Server<T> {
+        this.routes.push(new Route(method, path, handler))
         return this as any
     }
 
@@ -24,10 +37,9 @@ export class Server<T extends Array<Route<any, any>>> {
         const server = http.createServer((httpRequest, httpResponse) => {
             httpRequest.setEncoding('utf8')
 
-
             const method = httpRequest.method ?? 'GET'
             const url = httpRequest.url ?? '/'
-            let match: Match | undefined
+            let match: Match<any> | undefined
 
             for (const route of this.routes) {
                 const m = route.matches(method, url)
@@ -48,29 +60,31 @@ export class Server<T extends Array<Route<any, any>>> {
                 body += chunk
             })
             httpRequest.on('end', () => {
-                const request: Request<any, any> = {
-                    body,
+                const request: Request<any> = {
+                    body: tryParseJson(body, {}),
                     method,
                     path: httpRequest.url,
                     routeParams: match?.params,
                 }
-                const response = match!.handler(request)
-                let responseStatus = 200
-                let responseBody = ''
-                let responseHeaders: Map<string> = {}
 
-                if (hasOwnProperty(response, 'body', 'status')) {
-                    responseStatus = response.status
-                    responseBody = response.body
-                } else if (typeof response === 'object') {
-                    responseBody = JSON.stringify(response)
-                    responseHeaders['Content-Type'] = 'application/json'
-                } else {
-                    responseBody = String(response)
-                }
+                Promise.resolve(match!.handler(request)).then(response => {
+                    let responseStatus = 200
+                    let responseBody = ''
+                    let responseHeaders: Map<string> = {}
 
-                httpResponse.writeHead(responseStatus, responseHeaders)
-                httpResponse.end(responseBody)
+                    if (hasOwnProperty(response, 'body', 'status')) {
+                        responseStatus = response.status
+                        responseBody = response.body
+                    } else if (typeof response === 'object') {
+                        responseBody = JSON.stringify(response)
+                        responseHeaders['Content-Type'] = 'application/json'
+                    } else {
+                        responseBody = String(response)
+                    }
+
+                    httpResponse.writeHead(responseStatus, responseHeaders)
+                    httpResponse.end(responseBody)
+                })
             })
         })
 

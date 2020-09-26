@@ -1,19 +1,20 @@
-import { Map, toArray } from '@common/util'
+import { toArray } from '@common/util'
+import { Map, RouteLike } from '@common/types'
 
-export type Method = 'GET' | 'POST' | 'PUT' | 'DELETE'
-export type Request<M extends Method, P extends string> = {
-    body?: string
-    method: M
-    routeParams?: Map<string>
-    path: P
+export type Request<R extends RouteLike<any, any>> = {
+    body?: R['requestBody']
+    method: R['method']
+    routeParams?: R['routeParams']
+    path: R['path']
     query?: Map<string>
 }
-export type Response =
-    | string
-    | object
-    | { status: number, body: string, headers?: Map<string> }
-export type RouteHandler<M extends Method, U extends string> = {
-    (request: Request<M, U>): Response
+export type Response<B> =
+    | B
+    | { status: number, body: B }
+    | PromiseLike<Response<B>>
+
+export type RouteHandler<R extends RouteLike<any, any>> = {
+    (request: Request<R>): Response<R['responseBody']>
 }
 
 type CompiledPath = {
@@ -52,24 +53,24 @@ function compilePath(path: string): CompiledPath {
     return { pattern: regexp, paramNames }
 }
 
-export type Match = {
-    handler: RouteHandler<any, any>
-    params: Map<string>
+export type Match<R extends RouteLike<any, any>> = {
+    handler: RouteHandler<R>
+    params: R['routeParams']
 }
 
-export class Route<M extends Method, U extends string> {
-    private readonly method: M
-    private readonly path: U
-    private readonly handler: RouteHandler<M, U>
+export class Route<R extends RouteLike<any, any>> {
+    private readonly method: R['method']
+    private readonly path: R['path']
+    private readonly handler: RouteHandler<R>
     private compiled: CompiledPath | undefined
 
-    constructor(method: M, path: U, handler: RouteHandler<M, U>) {
+    constructor(method: R['method'], path: R['path'], handler: RouteHandler<R>) {
         this.method = method
         this.path = path
         this.handler = handler
     }
 
-    public matches(method: string, path: string): Match | undefined {
+    public matches(method: string, path: string): Match<R> | undefined {
         method = String(method).toLowerCase()
 
         if (this.method.toLowerCase() !== method) {
