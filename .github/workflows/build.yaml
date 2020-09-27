@@ -19,6 +19,8 @@ jobs:
       - name: Install server dependencies
         run: npm --prefix server ci
       - name: 'Lint: client'
-        run: npm --prefix client run lint
+        run: npm run lint
+        working-directory: client
       - name: 'Lint: server'
-        run: npm --prefix server run lint
+        run: npm run lint
+        working-directory: server
