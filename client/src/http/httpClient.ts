@@ -26,7 +26,7 @@ class WebHttpClient {
 
         const response = await fetch(request.url, {
             method: request.method,
-            headers: headers
+            headers: headers,
         });
         return response.json();
     }

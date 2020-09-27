@@ -9,8 +9,8 @@ class PersonRepository {
             url: 'http://localhost:8080/person',
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         });
         return json as Person[];
     }

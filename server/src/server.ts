@@ -33,7 +33,7 @@ export class Server<T extends RouteLike<any, any>> {
     constructor(port: string, host?: string) {
         this.port = port;
         this.host = host || '127.0.0.1';
-        this.routes = [] as any;
+        this.routes = [];
     }
 
     public route<
@@ -45,12 +45,13 @@ export class Server<T extends RouteLike<any, any>> {
         handler: RouteHandler<FindRoute<T, M, P>>
     ): Server<T> {
         this.routes.push(new Route(method, path, handler));
-        return this as any;
+        return this;
     }
 
     public listen(): void {
         const server = http.createServer((httpRequest, httpResponse) => {
             httpRequest.setEncoding('utf8');
+
             // Set CORS headers
             httpResponse.setHeader('Access-Control-Allow-Origin', '*');
             httpResponse.setHeader('Access-Control-Request-Method', '*');
@@ -93,7 +94,7 @@ export class Server<T extends RouteLike<any, any>> {
                     body: tryParseJson(body, {}),
                     method,
                     path: httpRequest.url,
-                    routeParams: match?.params
+                    routeParams: match?.params,
                 };
 
                 Promise.resolve(match!.handler(request)).then((response) => {
