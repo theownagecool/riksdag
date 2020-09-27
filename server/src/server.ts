@@ -59,7 +59,7 @@ export class Server<T extends RouteLike<any, any>> {
             httpResponse.setHeader('Access-Control-Request-Method', '*');
             httpResponse.setHeader(
                 'Access-Control-Allow-Methods',
-                'OPTIONS, GET'
+                'GET, PUT, POST, DELETE, OPTIONS'
             );
             httpResponse.setHeader('Access-Control-Allow-Headers', '*');
 
