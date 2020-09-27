@@ -1,6 +1,6 @@
 import * as ReactDOM from 'react-dom';
 import * as React from 'react';
-import { Test } from '@client/app/Test';
+import { App } from '@client/app/App';
 
 const rootContainer = document.getElementById('react-root');
-ReactDOM.render(React.createElement(Test), rootContainer);
+ReactDOM.render(React.createElement(App), rootContainer);
