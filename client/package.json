@@ -3,12 +3,14 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "dev": "webpack-dev-server --no-inline"
+        "dev": "webpack-dev-server --no-inline",
+        "lint": "prettier --config \"../.prettierrc\" --check **.{ts,tsx}"
     },
     "author": "",
     "license": "ISC",
     "devDependencies": {
         "html-webpack-plugin": "4.5.0",
+        "prettier": "^2.1.2",
         "ts-loader": "8.0.4",
         "typescript": "4.0.3",
         "webpack": "4.44.2",
