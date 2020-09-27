@@ -50,6 +50,8 @@ export class Server<T extends RouteLike<any, any>> {
 
     public listen(): void {
         const server = http.createServer((httpRequest, httpResponse) => {
+            // "utf8" tells node to give us the request body
+            // as a string. otherwise we would receive Buffer-objects.
             httpRequest.setEncoding('utf8');
 
             // Set CORS headers
@@ -89,7 +91,7 @@ export class Server<T extends RouteLike<any, any>> {
             httpRequest.on('data', (chunk) => {
                 body += chunk;
             });
-            httpRequest.on('end', () => {
+            httpRequest.on('end', async () => {
                 const request: Request<any> = {
                     body: tryParseJson(body, {}),
                     method,
@@ -97,24 +99,24 @@ export class Server<T extends RouteLike<any, any>> {
                     routeParams: match?.params,
                 };
 
-                Promise.resolve(match!.handler(request)).then((response) => {
-                    let responseStatus = 200;
-                    let responseBody = '';
-                    let responseHeaders: Map<string> = {};
+                const response = await Promise.resolve(match!.handler(request));
 
-                    if (hasOwnProperty(response, 'body', 'status')) {
-                        responseStatus = response.status;
-                        responseBody = response.body;
-                    } else if (typeof response === 'object') {
-                        responseBody = JSON.stringify(response);
-                        responseHeaders['Content-Type'] = 'application/json';
-                    } else {
-                        responseBody = String(response);
-                    }
+                let responseStatus = 200;
+                let responseBody = '';
+                let responseHeaders: Map<string> = {};
 
-                    httpResponse.writeHead(responseStatus, responseHeaders);
-                    httpResponse.end(responseBody);
-                });
+                if (hasOwnProperty(response, 'body', 'status')) {
+                    responseStatus = response.status;
+                    responseBody = response.body;
+                } else if (typeof response === 'object') {
+                    responseBody = JSON.stringify(response);
+                    responseHeaders['Content-Type'] = 'application/json';
+                } else {
+                    responseBody = String(response);
+                }
+
+                httpResponse.writeHead(responseStatus, responseHeaders);
+                httpResponse.end(responseBody);
             });
         });
 

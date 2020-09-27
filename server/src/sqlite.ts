@@ -44,10 +44,10 @@ export class SQLite3Database implements Database<sqlite.Statement> {
         this.db = new sqlite.Database(dsn);
     }
 
-    public execute(
+    public async execute(
         sql: string,
         params: ReadonlyArray<any> = []
-    ): PromiseLike<void> {
+    ): Promise<void> {
         return this.prepare(sql, SQLite3Database.TRANSFORM_EXECUTE).execute(
             params
         );
@@ -61,16 +61,16 @@ export class SQLite3Database implements Database<sqlite.Statement> {
         return new SQLite3Statement(stmt, handler);
     }
 
-    public select<R>(
+    public async select<R>(
         sql: string,
         params: ReadonlyArray<any> = []
-    ): PromiseLike<ReadonlyArray<R>> {
+    ): Promise<ReadonlyArray<R>> {
         return this.prepare(sql, SQLite3Database.TRANSFORM_SELECT).execute(
             params
         );
     }
 
-    public transaction<R>(fn: () => R | PromiseLike<R>): PromiseLike<R> {
+    public async transaction<R>(fn: () => R | PromiseLike<R>): Promise<R> {
         return new Promise((resolve, reject) => {
             this.db.serialize(() => {
                 const result = fn();

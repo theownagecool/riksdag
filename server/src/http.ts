@@ -15,7 +15,7 @@ type HttpResponse<Body = string> = {
     status: number;
 };
 
-type HttpClient = {
+export type HttpClient = {
     send: (request: HttpRequest) => PromiseLike<HttpResponse>;
 };
 
