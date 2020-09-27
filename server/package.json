@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "start": "ts-node --require tsconfig-paths/register --project \"tsconfig.json\" src/index.ts",
-    "lint": "prettier --config \"../.prettierrc\" --check **.ts"
+    "lint": "prettier --config \"../.prettierrc\" --check \"src/**/*.ts\""
   },
   "author": "THEOWNAGECOOL",
   "license": "MIT",
