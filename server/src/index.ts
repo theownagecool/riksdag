@@ -5,7 +5,8 @@ import { Routes } from '@common/types';
 import { NodeJSHttpClient } from './http';
 import { SQLite3Database } from './sqlite';
 import { Syncer } from './sync/syncer';
-import { SyncPersons } from './sync/person';
+import { SyncPersons } from './sync/persons';
+import { SyncPolls } from '@server/sync/polls';
 
 const db = new SQLite3Database(':memory:');
 db.execute('PRAGMA foreign_keys = ON');
@@ -25,11 +26,15 @@ db.transaction(async () => {
 });
 
 const httpClient = new NodeJSHttpClient();
-const syncer = new Syncer(db, httpClient, [SyncPersons]);
+const syncer = new Syncer(db, httpClient, [SyncPersons, SyncPolls]);
 syncer.execute();
 
-const server = new Server<Routes>('8080').route('GET', '/person', (request) => {
-    return db.select('SELECT * FROM person');
-});
+const server = new Server<Routes>('8080')
+    .route('GET', '/person', (request) => {
+        return db.select('SELECT * FROM person');
+    })
+    .route('GET', '/poll', (request) => {
+        return db.select('SELECT * FROM poll');
+    });
 
 server.listen();

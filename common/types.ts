@@ -1,4 +1,8 @@
 export type Map<T> = { [key: string]: T }
+export type StringLike = {
+    toString: () => string
+}
+
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
 export type RouteLike<M extends HttpMethod, Path extends string, RequestBody = unknown, ResponseBody = unknown, Params = unknown> = {
     method: M
@@ -15,14 +19,33 @@ export enum Gender {
 }
 
 export type Person = {
-    id?: number
     family_name: string
     gender: Gender
     given_name: string
     party: string
+    person_id?: number
     source_id: string
     status: string
     year_of_birth: number
+}
+
+export type Poll = {
+    date: string
+    poll_id?: number
+    title: string
+    votes: ReadonlyArray<Vote>
+}
+
+export enum VoteAnswer {
+    No = 0,
+    Yes = 1,
+    Abstain = 2,
+    Absent = 3,
+}
+
+export type Vote = {
+    answer: VoteAnswer
+    person_id: number
 }
 
 export type RemotePersonResponse = {
@@ -30,6 +53,7 @@ export type RemotePersonResponse = {
         person: ReadonlyArray<{
             efternamn: string
             fodd_ar: string
+            intressent_id: string
             kon: string
             parti: string
             sourceid: string
@@ -40,5 +64,5 @@ export type RemotePersonResponse = {
 }
 
 export type Routes =
-    | RouteLike<'GET', '/person/{id}', unknown, Person, { id: number }>
     | RouteLike<'GET', '/person', unknown, ReadonlyArray<Person>>
+    | RouteLike<'GET', '/poll', unknown, ReadonlyArray<Poll>>

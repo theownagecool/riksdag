@@ -1,11 +1,13 @@
-import { HttpMethod, Map } from '@common/types';
+import { HttpMethod, Map, StringLike } from '@common/types';
 import { ClientRequestArgs } from 'http';
 // import http = require('http')
 import https = require('https');
 
-type HttpRequest<Body = string> = {
+export type HttpRequest<Body = string> = {
     body?: Body;
+    headers?: Map<string | string[] | undefined>;
     method: HttpMethod;
+    query?: Map<StringLike>;
     url: string;
 };
 
@@ -23,7 +25,13 @@ export class NodeJSHttpClient implements HttpClient {
     public async send(request: HttpRequest): Promise<HttpResponse> {
         return new Promise((resolve, reject) => {
             const url = new URL(request.url);
+
+            for (const entry of Object.entries(request.query ?? {})) {
+                url.searchParams.set(entry[0], entry[1].toString());
+            }
+
             const options: ClientRequestArgs = {
+                headers: request.headers,
                 host: url.host,
                 method: request.method,
                 path: url.pathname + url.search,
