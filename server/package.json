@@ -5,19 +5,34 @@
   "scripts": {
     "start": "ts-node --require tsconfig-paths/register --project \"tsconfig.json\" src/index.ts",
     "lint": "prettier --config \"../.prettierrc\" --check \"src/**/*.ts\"",
-    "lint:fix": "prettier --config \"../.prettierrc\" --write \"src/**/*.ts\""
+    "lint:fix": "prettier --config \"../.prettierrc\" --write \"src/**/*.ts\"",
+    "test": "jest --no-cache"
   },
   "author": "THEOWNAGECOOL",
   "license": "MIT",
   "dependencies": {
     "@types/node": "^14.11.2",
+    "@types/sax": "^1.2.1",
     "@types/sqlite3": "^3.1.6",
+    "sax": "^1.2.4",
     "sqlite3": "^5.0.0",
     "ts-node": "^9.0.0",
     "tsconfig-paths": "^3.9.0",
     "typescript": "^4.0.3"
   },
   "devDependencies": {
-    "prettier": "^2.1.2"
+    "@types/jest": "^26.0.14",
+    "jest": "^26.4.2",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testRegex": [
+      "src/.+\\.test\\.tsx?$"
+    ],
+    "transform": {
+      "\\.tsx?$": "ts-jest"
+    }
   }
 }

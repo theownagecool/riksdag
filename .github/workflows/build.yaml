@@ -20,5 +20,7 @@ jobs:
         run: npm --prefix server ci
       - name: 'Lint: client'
         run: npm --prefix client run lint
+      - name: 'Test: server'
+        run: npm --prefix server test
       - name: 'Lint: server'
         run: npm --prefix server run lint
