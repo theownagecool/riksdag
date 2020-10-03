@@ -6,24 +6,24 @@ export type XMLNode = {
     value: string;
 };
 
-type CallbackMap<C> = {
-    [name: string]: (node: XMLNode, context?: C) => unknown;
+type CallbackMap<Context> = {
+    [name: string]: (node: XMLNode, context: Context) => unknown;
 };
 
 // 2020-10-03
 // we have to implement this fucking bullshit because
 // node doesn't have any XML-related libraries at all
 // in its stdlib.
-export class XMLCallbackReader<C> {
-    protected callbacks: CallbackMap<C>;
+export class XMLCallbackReader<Context> {
+    protected callbacks: CallbackMap<Context>;
     protected stack: Array<XMLNode>;
 
-    constructor(callbacks: CallbackMap<C>) {
+    constructor(callbacks: CallbackMap<Context>) {
         this.callbacks = callbacks;
         this.stack = [];
     }
 
-    public parse(data: string, context?: C): C | undefined {
+    public parse(data: string, context: Context): Context {
         this.stack = [];
         const parser = new sax.SAXParser(true);
 
@@ -57,6 +57,7 @@ export class XMLCallbackReader<C> {
         };
 
         parser.write(data);
+        parser.close();
 
         return context;
     }

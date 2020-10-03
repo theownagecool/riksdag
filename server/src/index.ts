@@ -10,10 +10,7 @@ import { SyncPolls } from '@server/sync/polls';
 
 const db = new SQLite3Database(':memory:');
 db.execute('PRAGMA foreign_keys = ON');
-const schema = fs.readFileSync(
-    path.resolve(__dirname, '../../schema.sql'),
-    'utf8'
-);
+const schema = fs.readFileSync(path.resolve(__dirname, '../../schema.sql'), 'utf8');
 db.transaction(async () => {
     const tables = schema
         .split(';')

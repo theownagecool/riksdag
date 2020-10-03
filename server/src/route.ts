@@ -8,10 +8,7 @@ export type Request<R extends RouteLike<any, any>> = {
     path: R['path'];
     query?: Map<string>;
 };
-export type Response<B> =
-    | B
-    | { status: number; body: B }
-    | PromiseLike<Response<B>>;
+export type Response<B> = B | { status: number; body: B } | PromiseLike<Response<B>>;
 
 export type RouteHandler<R extends RouteLike<any, any>> = {
     (request: Request<R>): Response<R['responseBody']>;
@@ -64,11 +61,7 @@ export class Route<R extends RouteLike<any, any>> {
     private readonly handler: RouteHandler<R>;
     private compiled: CompiledPath | undefined;
 
-    constructor(
-        method: R['method'],
-        path: R['path'],
-        handler: RouteHandler<R>
-    ) {
+    constructor(method: R['method'], path: R['path'], handler: RouteHandler<R>) {
         this.method = method;
         this.path = path;
         this.handler = handler;

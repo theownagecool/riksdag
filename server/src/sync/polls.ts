@@ -46,18 +46,12 @@ INSERT INTO poll (date, title, source_id)
     const ids = idResponse.body.split(',');
     const parser = new XMLCallbackReader<ParseContext>({
         dokument: (node, ctx) => {
-            ctx!.title =
-                node.children.find((child) => child.name === 'titel')?.value ??
-                '';
-            ctx!.date =
-                node.children.find((child) => child.name === 'datum')?.value ??
-                '';
+            ctx.title = node.children.find((child) => child.name === 'titel')?.value ?? '';
+            ctx.date = node.children.find((child) => child.name === 'datum')?.value ?? '';
         },
         votering: (node, ctx) => {
-            const personId =
-                node.children.find((child) => child.name === 'intressent_id')
-                    ?.value ?? '0';
-            ctx!.votes.push({
+            const personId = node.children.find((child) => child.name === 'intressent_id')?.value ?? '0';
+            ctx.votes.push({
                 answer: VoteAnswer.No,
                 person_id: parseInt(personId),
             });

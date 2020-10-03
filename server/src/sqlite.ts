@@ -5,10 +5,7 @@ class SQLite3Statement<R> implements Statement<R> {
     protected stmt: sqlite.Statement;
     protected transform: StatementTransform<sqlite.Statement, R>;
 
-    constructor(
-        stmt: sqlite.Statement,
-        transform: StatementTransform<sqlite.Statement, R>
-    ) {
+    constructor(stmt: sqlite.Statement, transform: StatementTransform<sqlite.Statement, R>) {
         this.stmt = stmt;
         this.transform = transform;
     }
@@ -44,30 +41,17 @@ export class SQLite3Database implements Database<sqlite.Statement> {
         this.db = new sqlite.Database(dsn);
     }
 
-    public async execute(
-        sql: string,
-        params: ReadonlyArray<any> = []
-    ): Promise<void> {
-        return this.prepare(sql, SQLite3Database.TRANSFORM_EXECUTE).execute(
-            params
-        );
+    public async execute(sql: string, params: ReadonlyArray<any> = []): Promise<void> {
+        return this.prepare(sql, SQLite3Database.TRANSFORM_EXECUTE).execute(params);
     }
 
-    public prepare<R>(
-        sql: string,
-        handler: StatementTransform<sqlite.Statement, R>
-    ): Statement<R> {
+    public prepare<R>(sql: string, handler: StatementTransform<sqlite.Statement, R>): Statement<R> {
         const stmt = this.db.prepare(sql);
         return new SQLite3Statement(stmt, handler);
     }
 
-    public async select<R>(
-        sql: string,
-        params: ReadonlyArray<any> = []
-    ): Promise<ReadonlyArray<R>> {
-        return this.prepare(sql, SQLite3Database.TRANSFORM_SELECT).execute(
-            params
-        );
+    public async select<R>(sql: string, params: ReadonlyArray<any> = []): Promise<ReadonlyArray<R>> {
+        return this.prepare(sql, SQLite3Database.TRANSFORM_SELECT).execute(params);
     }
 
     public async transaction<R>(fn: () => R | PromiseLike<R>): Promise<R> {
@@ -79,13 +63,7 @@ export class SQLite3Database implements Database<sqlite.Statement> {
         });
     }
 
-    public static TRANSFORM_EXECUTE = createTransform<void>(
-        sqlite.Statement.prototype.run
-    );
-    public static TRANSFORM_SELECT = createTransform<any>(
-        sqlite.Statement.prototype.all
-    );
-    public static TRANSFORM_SELECT_ONE = createTransform<any>(
-        sqlite.Statement.prototype.get
-    );
+    public static TRANSFORM_EXECUTE = createTransform<void>(sqlite.Statement.prototype.run);
+    public static TRANSFORM_SELECT = createTransform<any>(sqlite.Statement.prototype.all);
+    public static TRANSFORM_SELECT_ONE = createTransform<any>(sqlite.Statement.prototype.get);
 }

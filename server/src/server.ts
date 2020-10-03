@@ -4,20 +4,12 @@ import { HttpMethod, RouteLike, Map } from '@common/types';
 import { hasOwnProperty } from '@common/util';
 
 type FindMethods<T extends RouteLike<any, any>> = T['method'];
-type FindRouteByMethod<
-    T extends RouteLike<any, any>,
-    M extends HttpMethod
-> = T extends { method: M } ? T : never;
-type FindRoute<
-    T extends RouteLike<any, any>,
-    M extends HttpMethod,
-    P extends string
-> = T extends { method: M; path: P } ? T : never;
+type FindRouteByMethod<T extends RouteLike<any, any>, M extends HttpMethod> = T extends { method: M } ? T : never;
+type FindRoute<T extends RouteLike<any, any>, M extends HttpMethod, P extends string> = T extends { method: M; path: P }
+    ? T
+    : never;
 
-function tryParseJson<T extends string, D = undefined>(
-    value: T,
-    def?: D
-): object | D {
+function tryParseJson<T extends string, D = undefined>(value: T, def?: D): object | D {
     try {
         return JSON.parse(value);
     } catch (e) {
@@ -36,10 +28,7 @@ export class Server<T extends RouteLike<any, any>> {
         this.routes = [];
     }
 
-    public route<
-        M extends FindMethods<T>,
-        P extends FindRouteByMethod<T, M>['path']
-    >(
+    public route<M extends FindMethods<T>, P extends FindRouteByMethod<T, M>['path']>(
         method: M,
         path: P,
         handler: RouteHandler<FindRoute<T, M, P>>
@@ -57,10 +46,7 @@ export class Server<T extends RouteLike<any, any>> {
             // Set CORS headers
             httpResponse.setHeader('Access-Control-Allow-Origin', '*');
             httpResponse.setHeader('Access-Control-Request-Method', '*');
-            httpResponse.setHeader(
-                'Access-Control-Allow-Methods',
-                'GET, PUT, POST, DELETE, OPTIONS'
-            );
+            httpResponse.setHeader('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS');
             httpResponse.setHeader('Access-Control-Allow-Headers', '*');
 
             if (httpRequest.method === 'OPTIONS') {
