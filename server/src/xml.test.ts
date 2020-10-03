@@ -2,7 +2,7 @@ import { XMLCallbackReader, XMLNode } from './xml';
 
 describe('xml tests', () => {
     it('should parse a simple text values', () => {
-        const nodes: Array<XMLNode<'yee'>> = [];
+        const nodes: Array<XMLNode> = [];
         const rdr = new XMLCallbackReader({
             yee: (node) => {
                 nodes.push(node);
@@ -22,7 +22,7 @@ describe('xml tests', () => {
     });
 
     it('should include nested nodes in output', () => {
-        const nodes: Array<XMLNode<'yee'>> = [];
+        const nodes: Array<XMLNode> = [];
         const rdr = new XMLCallbackReader({
             yee: (node) => {
                 nodes.push(node);

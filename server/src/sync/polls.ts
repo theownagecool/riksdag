@@ -1,6 +1,8 @@
 import { SQLite3Database } from '@server/sqlite';
 import { HttpRequest } from '@server/http';
 import { SyncAction } from '@server/sync/syncer';
+import { XMLCallbackReader } from '@server/xml';
+import { Vote, VoteAnswer } from '@common/types';
 
 function createPollIdsRequest(year: number): HttpRequest {
     // 2019 -> "2019/20"
@@ -25,16 +27,11 @@ function createPollRequest(id: string): HttpRequest {
     };
 }
 
-function findValueOfElement(body: string, name: string): ReadonlyArray<string> {
-    const pattern = new RegExp(`<${name}>([^<]+)`, 'g');
-    const out: Array<string> = [];
-    let match: RegExpMatchArray | null;
-
-    while ((match = pattern.exec(body))) {
-        out.push(match[1]);
-    }
-    return out;
-}
+type ParseContext = {
+    date: string;
+    title: string;
+    votes: Array<Vote>;
+};
 
 export const SyncPolls: SyncAction<unknown> = async (db, http) => {
     const idResponse = await http.send(createPollIdsRequest(2019));
@@ -47,12 +44,36 @@ INSERT INTO poll (date, title, source_id)
     );
 
     const ids = idResponse.body.split(',');
+    const parser = new XMLCallbackReader<ParseContext>({
+        dokument: (node, ctx) => {
+            ctx!.title =
+                node.children.find((child) => child.name === 'titel')?.value ??
+                '';
+            ctx!.date =
+                node.children.find((child) => child.name === 'datum')?.value ??
+                '';
+        },
+        votering: (node, ctx) => {
+            const personId =
+                node.children.find((child) => child.name === 'intressent_id')
+                    ?.value ?? '0';
+            ctx!.votes.push({
+                answer: VoteAnswer.No,
+                person_id: parseInt(personId),
+            });
+        },
+    });
 
     for (const id of ids) {
         const pollResponse = await http.send(createPollRequest(id));
-        const title =
-            findValueOfElement(pollResponse.body, 'titel')?.[0] || 'N/A';
+        const result = parser.parse(pollResponse.body, {
+            date: '',
+            title: '',
+            votes: [],
+        });
 
-        await stmt.execute(['2000-01-01 00:00:00', title, id]);
+        await stmt.execute([result?.date, result?.title, id]);
+
+        console.log(result);
     }
 };

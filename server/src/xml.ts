@@ -1,35 +1,35 @@
 import sax = require('sax');
 
-export type XMLNode<Name> = {
-    children: ReadonlyArray<XMLNode<unknown>>;
-    name: Name;
+export type XMLNode = {
+    children: ReadonlyArray<XMLNode>;
+    name: string;
     value: string;
 };
 
-type CallbackMap<Names extends string> = {
-    [N in Names]: (node: XMLNode<N>) => unknown;
+type CallbackMap<C> = {
+    [name: string]: (node: XMLNode, context?: C) => unknown;
 };
 
 // 2020-10-03
 // we have to implement this fucking bullshit because
 // node doesn't have any XML-related libraries at all
 // in its stdlib.
-export class XMLCallbackReader<Names extends string> {
-    protected callbacks: CallbackMap<Names>;
-    protected stack: Array<XMLNode<any>>;
+export class XMLCallbackReader<C> {
+    protected callbacks: CallbackMap<C>;
+    protected stack: Array<XMLNode>;
 
-    constructor(callbacks: CallbackMap<Names>) {
+    constructor(callbacks: CallbackMap<C>) {
         this.callbacks = callbacks;
         this.stack = [];
     }
 
-    public parse(data: string): void {
+    public parse(data: string, context?: C): C | undefined {
         this.stack = [];
         const parser = new sax.SAXParser(true);
 
         parser.onopentag = (tag) => {
             if (tag.name in this.callbacks || this.stack.length > 0) {
-                const node: XMLNode<any> = {
+                const node: XMLNode = {
                     children: [],
                     name: tag.name,
                     value: '',
@@ -45,10 +45,7 @@ export class XMLCallbackReader<Names extends string> {
         parser.onclosetag = (name) => {
             const node = this.stack.pop();
             if (name in this.callbacks) {
-                this.callbacks[name as Names].call(
-                    undefined,
-                    node as XMLNode<any>
-                );
+                this.callbacks[name].call(undefined, node!, context);
             }
         };
 
@@ -60,5 +57,7 @@ export class XMLCallbackReader<Names extends string> {
         };
 
         parser.write(data);
+
+        return context;
     }
 }
