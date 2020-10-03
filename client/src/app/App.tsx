@@ -1,22 +1,15 @@
 import * as React from 'react';
-import { personRepository } from '@client/http/personRepository';
-import { Person } from '@common/types';
-import { PersonComponent } from '@client/app/Person';
-import { useEffect, useState } from 'react';
+import '@client/less/style.less';
 
 export function App() {
-    const [persons, setPersons] = useState<Person[]>([]);
-
-    useEffect(() => {
-        const personsPromise = personRepository.getPersons();
-        personsPromise.then((persons) => setPersons(persons));
-    }, [persons]);
-
     return (
-        <div>
-            {persons.map((person) => (
-                <PersonComponent person={person}></PersonComponent>
-            ))}
+        <div className="app">
+            <div className="app_header">
+                <div style={{ fontSize: '80px', width: '100%', textAlign: 'center' }}>BIG HEADER</div>
+            </div>
+            <div className="app_content">
+                <div style={{ fontSize: '120px', width: '100%', textAlign: 'center' }}>BIGGER WEBSITE</div>
+            </div>
         </div>
     );
 }
