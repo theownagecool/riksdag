@@ -7,8 +7,13 @@ type ModelDefinition<T> = {
     [K in keyof T]: Field<any, any>;
 };
 
-type Model<T extends ModelDefinition<any>, PK extends string> = { [K in keyof T]: DeriveType<T[K]> } &
-    { [K in PK]?: number } & { save(): Promise<unknown>; delete(): Promise<unknown> };
+type ModelMethods = {
+    delete(): Promise<unknown>;
+    save(): Promise<unknown>;
+};
+export type Model<T extends ModelDefinition<any>, PK extends string> = { [K in keyof T]: DeriveType<T[K]> } &
+    { readonly [K in PK]?: number } &
+    ModelMethods;
 
 type ModelClass<T extends ModelDefinition<any>, PK extends string> = {
     new (args: ModelConstructorArgs<T>): Model<T, PK>;
@@ -26,6 +31,27 @@ type ModelConstructorArgs<T extends ModelDefinition<any>> = { [K in RequiredCons
     { [K in OptionalConstructorKeys<T>]-?: DeriveType<T[K]> };
 
 type DatabaseResolver = () => Database | undefined;
+
+function buildColumnsAndValues<T extends ModelDefinition<any>>(
+    model: ModelBase<T>
+): [ReadonlyArray<string>, ReadonlyArray<any>] {
+    const columns: Array<string> = [];
+    const values: Array<any> = [];
+    const pkName = model.getPrimaryKeyName();
+
+    for (const key in model) {
+        // "undefined" means that we should use the database default
+        // for the column (if set). we also exclude the primary key
+        // to make it impossible to accidentally change the ID of
+        // an old model.
+        if (hasOwnProperty(model, key) && typeof model[key] !== 'undefined' && key !== pkName) {
+            columns.push(key);
+            values.push(model[key]);
+        }
+    }
+
+    return [columns, values];
+}
 
 export abstract class ModelBase<T extends ModelDefinition<any>> {
     public abstract getDefinition(): T;
@@ -53,31 +79,31 @@ export abstract class ModelBase<T extends ModelDefinition<any>> {
         }
     }
 
-    protected async insert(db: Database): Promise<QueryResult> {
+    protected insert(db: Database): Promise<QueryResult> {
         const tableName = this.getTableName();
-        const columns: Array<string> = [];
-        const values: Array<any> = [];
-
-        for (const key in this) {
-            if (hasOwnProperty(this, key) && typeof this[key] !== 'undefined') {
-                columns.push(key);
-                values.push(this[key]);
-            }
-        }
-
+        const [columns, values] = buildColumnsAndValues(this);
         const columnsAsString = columns.join(', ');
         const placeholdersAsString = repeat('?', columns.length).join(', ');
         const query = `
 INSERT INTO ${tableName} (${columnsAsString})
-     VALUES (${placeholdersAsString})
-        `;
+     VALUES (${placeholdersAsString})`;
 
-        return await db.execute(query, values);
+        return db.execute(query, values);
     }
 
     protected update(db: Database): Promise<unknown> {
-        // TODO: implement me
-        return Promise.reject(new Error('Not implemented'));
+        const tableName = this.getTableName();
+        const pkName = this.getPrimaryKeyName();
+        const [columns, values] = buildColumnsAndValues(this);
+        const statements = columns.map((c) => `${c} = ?`).join(', ');
+        const query = `
+UPDATE ${tableName}
+   SET ${statements}
+ WHERE ${pkName} = ?`;
+
+        const pk = (this as any)[pkName];
+
+        return db.execute(query, values.concat(pk));
     }
 }
 
@@ -148,3 +174,5 @@ export function createModel<T extends ModelDefinition<any>, PK extends string>(
 
     return (MyModelClass as unknown) as ModelClass<T, PK>;
 }
+
+export type DeriveModel<T> = T extends ModelClass<infer U, infer PK> ? Model<U, PK> : never;

@@ -61,6 +61,9 @@ export class SQLite3Database implements Database {
         const stmt = await this.prepare(sql, sqlite.Statement.prototype.run);
         const result = await stmt.execute(params);
         await stmt.close();
+
+        // lastId will probably only be defined when we insert
+        // something. updates should (?) probably not set this.
         return { lastId: result.result.lastID };
     }
 
@@ -68,7 +71,13 @@ export class SQLite3Database implements Database {
         const stmt = await this.prepare(sql, sqlite.Statement.prototype.all);
         const result = await stmt.execute(params);
         await stmt.close();
-        return result.args;
+
+        // args[0] is the first callback argument after "error".
+        // the signature of the callback looks something like this:
+        //
+        //   (err: Error | null, rows: any[]) => unknown
+        //
+        return result.args[0];
     }
 
     public async transaction<R>(fn: () => R | Promise<R>): Promise<R> {

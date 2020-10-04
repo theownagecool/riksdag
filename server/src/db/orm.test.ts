@@ -1,6 +1,6 @@
 import { Database } from '../db';
 import { SQLite3Database } from '../sqlite';
-import { createModel, Field, ModelBase } from './orm';
+import { createModel, DeriveModel, Field, ModelBase } from './orm';
 
 describe('ORM tests', () => {
     let db: Database | undefined;
@@ -9,6 +9,8 @@ describe('ORM tests', () => {
         age: Field.number().default(123),
         name: Field.string(),
     });
+
+    type PersonLike = DeriveModel<typeof PersonModel>;
 
     beforeEach(async () => {
         await db?.close();
@@ -25,8 +27,10 @@ describe('ORM tests', () => {
             name: 'Helmut',
         });
         await p.save();
-        const stuff = await db!.select('SELECT * FROM person', []);
+        const stuff = await db!.select<PersonLike>('SELECT * FROM person', []);
         expect(stuff.length).toBe(1);
+        expect(stuff[0].name).toBe('Helmut');
+        expect(stuff[0].age).toBe(123);
     });
 
     it('should use default values when not provided', async () => {
@@ -42,5 +46,16 @@ describe('ORM tests', () => {
         });
         await p.save();
         expect(p.id).toBe(1);
+    });
+
+    it('should update the model', async () => {
+        const p = new PersonModel({
+            name: 'Helmut',
+        });
+        await p.save();
+        p.name = 'Yee Boi';
+        await p.save();
+        const stuff = await db!.select<PersonLike>('SELECT * FROM person', []);
+        expect(stuff[0].name).toBe('Yee Boi');
     });
 });
