@@ -1,8 +1,8 @@
-import { Database } from '@server/db';
+import { Database } from '@server/db/db';
 import { HttpClient } from '@server/http';
 
 export type SyncAction<T> = {
-    (db: Database<any>, http: HttpClient): Promise<T>;
+    (db: Database, http: HttpClient): Promise<T>;
 };
 
 type ResultsOf<T extends Array<SyncAction<any>>> = {
@@ -10,11 +10,11 @@ type ResultsOf<T extends Array<SyncAction<any>>> = {
 };
 
 export class Syncer<T extends Array<SyncAction<any>>> {
-    protected db: Database<any>;
+    protected db: Database;
     protected http: HttpClient;
     protected actions: T;
 
-    constructor(db: Database<any>, http: HttpClient, actions: T) {
+    constructor(db: Database, http: HttpClient, actions: T) {
         this.db = db;
         this.http = http;
         this.actions = actions;

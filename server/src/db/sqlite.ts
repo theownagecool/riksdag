@@ -49,8 +49,11 @@ class SQLite3Statement<T extends any[]> implements Statement<SQLiteResult<T>> {
 export class SQLite3Database implements Database {
     protected db: sqlite.Database;
 
-    constructor(dsn: string) {
-        this.db = new sqlite.Database(dsn);
+    constructor(db: sqlite.Database | string) {
+        if (typeof db === 'string') {
+            db = new sqlite.Database(db);
+        }
+        this.db = db;
     }
 
     public async close() {

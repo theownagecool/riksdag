@@ -1,13 +1,12 @@
-import { SQLite3Database } from '@server/sqlite';
 import { HttpRequest } from '@server/http';
 import { SyncAction } from '@server/sync/syncer';
 import { XMLCallbackReader } from '@server/xml';
 import { Vote, VoteAnswer } from '@common/types';
+import { PollModel } from '@server/model';
 
 function createPollIdsRequest(year: number): HttpRequest {
     // 2019 -> "2019/20"
     const yearAsString = `${year}/` + (year + 1).toString().substr(2);
-
     return {
         method: 'GET',
         query: {
@@ -35,13 +34,6 @@ type ParseContext = {
 
 export const SyncPolls: SyncAction<unknown> = async (db, http) => {
     const idResponse = await http.send(createPollIdsRequest(2019));
-    const stmt = db.prepare(
-        `
-INSERT INTO poll (date, title, source_id)
-          VALUES (?, ?, ?)
-    `,
-        SQLite3Database.TRANSFORM_EXECUTE
-    );
 
     const ids = idResponse.body.split(',');
     const parser = new XMLCallbackReader<ParseContext>({
@@ -65,9 +57,14 @@ INSERT INTO poll (date, title, source_id)
             title: '',
             votes: [],
         });
+        const poll = new PollModel({
+            date: result?.date,
+            title: result?.title,
+            source_id: id,
+        });
 
-        await stmt.execute([result?.date, result?.title, id]);
+        await poll.save();
 
-        console.log(result);
+        console.log(poll);
     }
 };

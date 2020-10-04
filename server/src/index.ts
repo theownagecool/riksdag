@@ -3,9 +3,10 @@ import path = require('path');
 import { Server } from './server';
 import { Routes } from '@common/types';
 import { NodeJSHttpClient } from './http';
-import { SQLite3Database } from './sqlite';
+import { SQLite3Database } from './db/sqlite';
 import { Syncer } from './sync/syncer';
 import { SyncPersons } from './sync/persons';
+import { ModelBase } from './db/orm';
 import { SyncPolls } from '@server/sync/polls';
 
 const db = new SQLite3Database(':memory:');
@@ -21,7 +22,7 @@ db.transaction(async () => {
         await db.execute(table);
     }
 });
-
+ModelBase.resolveDatabase = () => db;
 const httpClient = new NodeJSHttpClient();
 const syncer = new Syncer(db, httpClient, [SyncPersons, SyncPolls]);
 syncer.execute();

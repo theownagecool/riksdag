@@ -6,7 +6,8 @@ CREATE TABLE "person" (
     "gender" TINYINT NOT NULL,
     "party" TEXT NOT NULL DEFAULT '',
     "status" TEXT NOT NULL DEFAULT '',
-    "source_id" TEXT NOT NULL DEFAULT ''
+    "source_id" TEXT NOT NULL DEFAULT '',
+    "intressent_id" TEXT NOT NULL DEFAULT ''
 );
 
 CREATE TABLE "poll" (

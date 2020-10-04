@@ -1,4 +1,4 @@
-import { Database, QueryResult } from '../db';
+import { Database, QueryResult } from './db';
 import { hasOwnProperty, repeat } from '../../../common/util';
 
 type DeriveType<T> = T extends Field<infer R, any> ? R : never;
@@ -24,11 +24,11 @@ type RequiredConstructorKeys<T extends ModelDefinition<any>> = {
 }[keyof T];
 
 type OptionalConstructorKeys<T extends ModelDefinition<any>> = {
-    [K in keyof T]-?: T[K]['defaultValue'] extends DeriveType<T[K]> ? never : K;
+    [K in keyof T]-?: T[K]['defaultValue'] extends DeriveType<T[K]> ? K : never;
 }[keyof T];
 
 type ModelConstructorArgs<T extends ModelDefinition<any>> = { [K in RequiredConstructorKeys<T>]: DeriveType<T[K]> } &
-    { [K in OptionalConstructorKeys<T>]-?: DeriveType<T[K]> };
+    { [K in OptionalConstructorKeys<T>]?: DeriveType<T[K]> };
 
 type DatabaseResolver = () => Database | undefined;
 
@@ -138,7 +138,7 @@ export function createModel<T extends ModelDefinition<any>, PK extends string>(
     primaryKeyName: PK,
     definition: T
 ): ModelClass<T, PK> {
-    class MyModelClass extends ModelBase<T> {
+    class ModelImpl extends ModelBase<T> {
         constructor(args: ModelConstructorArgs<T>) {
             super();
 
@@ -172,7 +172,7 @@ export function createModel<T extends ModelDefinition<any>, PK extends string>(
         }
     }
 
-    return (MyModelClass as unknown) as ModelClass<T, PK>;
+    return (ModelImpl as unknown) as ModelClass<T, PK>;
 }
 
 export type DeriveModel<T> = T extends ModelClass<infer U, infer PK> ? Model<U, PK> : never;

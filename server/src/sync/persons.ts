@@ -1,6 +1,6 @@
 import { SyncAction } from './syncer';
 import { RemotePersonResponse, Gender, Map } from '@common/types';
-import { SQLite3Database } from '@server/sqlite';
+import { PersonModel } from '@server/model';
 
 const GENDER_MAP: Map<Gender | undefined> = {
     man: Gender.Male,
@@ -17,22 +17,19 @@ export const SyncPersons: SyncAction<unknown> = async (db, http) => {
     });
 
     const parsed: RemotePersonResponse = JSON.parse(response.body);
-    const sql = `
-    INSERT INTO person (person_id, given_name, family_name, year_of_birth, gender, party, status, source_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const stmt = db.prepare(sql, SQLite3Database.TRANSFORM_EXECUTE);
 
     for (const person of parsed.personlista.person) {
-        await stmt.execute([
-            parseInt(person.intressent_id),
-            person.tilltalsnamn,
-            person.efternamn,
-            person.fodd_ar,
-            GENDER_MAP[person.kon] ?? Gender.Other,
-            person.parti,
-            person.status,
-            person.sourceid,
-        ]);
+        const p = new PersonModel({
+            given_name: person.tilltalsnamn,
+            family_name: person.efternamn,
+            year_of_birth: parseInt(person.fodd_ar),
+            gender: GENDER_MAP[person.kon] ?? Gender.Other,
+            party: person.parti,
+            status: person.status,
+            source_id: person.sourceid,
+            intressent_id: person.intressent_id,
+        });
+
+        await p.save();
     }
 };

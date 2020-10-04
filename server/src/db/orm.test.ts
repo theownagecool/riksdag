@@ -1,5 +1,5 @@
-import { Database } from '../db';
-import { SQLite3Database } from '../sqlite';
+import { Database } from './db';
+import { SQLite3Database } from './sqlite';
 import { createModel, DeriveModel, Field, ModelBase } from './orm';
 
 describe('ORM tests', () => {
