@@ -27,6 +27,10 @@
     "ts-jest": "^26.4.0"
   },
   "jest": {
+    "moduleNameMapper": {
+      "^@client/(.*)$": "<rootDir>/../client/src/$1",
+      "^@common/(.*)$": "<rootDir>/../common/$1"
+    },
     "testEnvironment": "node",
     "testRegex": [
       "src/.+\\.test\\.tsx?$"

@@ -1,5 +1,5 @@
 import { Database, QueryResult } from './db';
-import { hasOwnProperty, repeat } from '../../../common/util';
+import { hasOwnProperty, repeat } from '@common/util';
 
 type DeriveType<T> = T extends Field<infer R, any> ? R : never;
 
