@@ -1,12 +1,14 @@
+export type QueryResult = {
+    lastId?: number;
+    rows?: ReadonlyArray<any>;
+};
 export type Statement<R> = {
-    execute: (params: ReadonlyArray<any>) => PromiseLike<R>;
+    close: () => Promise<unknown>;
+    execute: (params: ReadonlyArray<any>) => Promise<R>;
 };
-export type StatementTransform<S, R> = {
-    (stmt: S): PromiseLike<R>;
-};
-export type Database<S> = {
-    execute: (sql: string, params: ReadonlyArray<any>) => PromiseLike<void>;
-    prepare: <R>(sql: string, transform: StatementTransform<S, R>) => Statement<R>;
-    select: <R>(sql: string, params: ReadonlyArray<any>) => PromiseLike<ReadonlyArray<R>>;
-    transaction: <R>(fn: () => R | PromiseLike<R>) => PromiseLike<R>;
+export type Database = {
+    close: () => Promise<unknown>;
+    execute: (sql: string, params: ReadonlyArray<any>) => Promise<QueryResult>;
+    select: <R>(sql: string, params: ReadonlyArray<any>) => Promise<ReadonlyArray<R>>;
+    transaction: <R>(fn: () => R | Promise<R>) => Promise<R>;
 };

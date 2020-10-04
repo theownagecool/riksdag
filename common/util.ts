@@ -20,3 +20,11 @@ export function find<T>(items: ArrayLike<T>, condition: (item: T) => boolean): T
 export function hasOwnProperty<T, K extends Array<string | number | symbol>>(value: T, ...keys: K): value is T & { [P in K[number]]: unknown } {
     return value && keys.every(key => Object.prototype.hasOwnProperty.call(value, key))
 }
+
+export function repeat<T>(value: T, length: number): ReadonlyArray<T> {
+    let out: Array<T> = []
+    for (let i = 0; i < length; ++i) {
+        out.push(value)
+    }
+    return out
+}
