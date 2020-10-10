@@ -1,5 +1,6 @@
 import * as React from 'react';
 import '@client/less/style.less';
+import { Persons } from '@client/app/Persons';
 
 export function App() {
     return (
@@ -8,7 +9,9 @@ export function App() {
                 <div style={{ fontSize: '80px', width: '100%', textAlign: 'center' }}>BIG HEADER</div>
             </div>
             <div className="app_content">
-                <div style={{ fontSize: '120px', width: '100%', textAlign: 'center' }}>BIGGER WEBSITE</div>
+                <div style={{ fontSize: '120px', width: '100%', textAlign: 'center' }}>
+                    <Persons></Persons>
+                </div>
             </div>
         </div>
     );
