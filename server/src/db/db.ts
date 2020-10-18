@@ -10,6 +10,6 @@ export type ResultTransform<R> = (result: QueryResult) => R;
 export type Database = {
     close: () => Promise<unknown>;
     execute: (sql: string, params: ReadonlyArray<any>) => Promise<QueryResult>;
-    select: <R>(sql: string, params: ReadonlyArray<any>) => Promise<ReadonlyArray<R>>;
+    select: <R>(sql: string, params?: ReadonlyArray<any>) => Promise<ReadonlyArray<R>>;
     transaction: <R>(fn: () => R | Promise<R>) => Promise<R>;
 };

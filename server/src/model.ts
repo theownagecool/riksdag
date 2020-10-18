@@ -18,7 +18,7 @@ export const PollModel = createModel('poll', 'poll_id', {
 });
 
 export const VoteModel = createModel('vote', 'vote_id', {
-    person_id: Field.number(),
-    poll_id: Field.number(),
+    intressent_id: Field.string(),
+    poll_id: Field.string(),
     answer: Field.number(),
 });

@@ -22,17 +22,13 @@ export class Syncer<T extends Array<SyncAction<any>>> {
 
     public async execute(): Promise<ResultsOf<T>> {
         const out: Array<any> = [];
-        const promises: Array<PromiseLike<any>> = [];
 
         for (let i = 0; i < this.actions.length; ++i) {
             const action = this.actions[i];
-            const promise = action(this.db, this.http);
-            promises.push(promise);
-            promise.then((res) => {
-                out[i] = res;
-            });
+            const res = await action(this.db, this.http);
+            out[i] = res;
         }
 
-        return Promise.all(promises).then(() => out as ResultsOf<T>);
+        return out as ResultsOf<T>;
     }
 }

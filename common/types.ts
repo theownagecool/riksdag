@@ -1,16 +1,22 @@
-export type Map<T> = { [key: string]: T }
+export type Map<T> = { [key: string]: T };
 export type StringLike = {
-    toString: () => string
-}
+    toString: () => string;
+};
 
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE'
-export type RouteLike<M extends HttpMethod, Path extends string, RequestBody = unknown, ResponseBody = unknown, Params = unknown> = {
-    method: M
-    path: Path
-    requestBody: RequestBody
-    responseBody: ResponseBody
-    routeParams: Params
-}
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+export type RouteLike<
+    M extends HttpMethod,
+    Path extends string,
+    RequestBody = unknown,
+    ResponseBody = unknown,
+    Params = unknown
+> = {
+    method: M;
+    path: Path;
+    requestBody: RequestBody;
+    responseBody: ResponseBody;
+    routeParams: Params;
+};
 
 export enum Gender {
     Male = 0,
@@ -19,22 +25,22 @@ export enum Gender {
 }
 
 export type Person = {
-    family_name: string
-    gender: Gender
-    given_name: string
-    party: string
-    person_id?: number
-    source_id: string
-    status: string
-    year_of_birth: number
-}
+    family_name: string;
+    gender: Gender;
+    given_name: string;
+    party: string;
+    intressent_id: number;
+    source_id: string;
+    status: string;
+    year_of_birth: number;
+};
 
 export type Poll = {
-    date: string
-    poll_id?: number
-    title: string
-    votes: ReadonlyArray<Vote>
-}
+    date: string;
+    source_id: number;
+    title: string;
+    votes: ReadonlyArray<Vote>;
+};
 
 export enum VoteAnswer {
     No = 0,
@@ -44,25 +50,30 @@ export enum VoteAnswer {
 }
 
 export type Vote = {
-    answer: VoteAnswer
-    person_id: number
-}
+    answer: VoteAnswer;
+    intressent_id: string;
+};
 
 export type RemotePersonResponse = {
     personlista: {
         person: ReadonlyArray<{
-            efternamn: string
-            fodd_ar: string
-            intressent_id: string
-            kon: string
-            parti: string
-            sourceid: string
-            status: string
-            tilltalsnamn: string
-        }>
-    }
-}
+            efternamn: string;
+            fodd_ar: string;
+            intressent_id: string;
+            kon: string;
+            parti: string;
+            sourceid: string;
+            status: string;
+            tilltalsnamn: string;
+        }>;
+    };
+};
+
+export type PersonVotesParams = {
+    personId: string;
+};
 
 export type Routes =
     | RouteLike<'GET', '/person', unknown, ReadonlyArray<Person>>
     | RouteLike<'GET', '/poll', unknown, ReadonlyArray<Poll>>
+    | RouteLike<'GET', '/person/votes/{personId}', unknown, ReadonlyArray<Vote>, PersonVotesParams>;

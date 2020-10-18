@@ -1,5 +1,5 @@
 import { SyncAction } from './syncer';
-import { RemotePersonResponse, Gender, Map } from '@common/types';
+import { RemotePersonResponse, Gender, Map, Person } from '@common/types';
 import { PersonModel } from '@server/model';
 
 const GENDER_MAP: Map<Gender | undefined> = {
@@ -12,13 +12,31 @@ export const SyncPersons: SyncAction<unknown> = async (db, http) => {
         method: 'GET',
         query: {
             utformat: 'json',
+            rdlstatus: 'samtliga',
         },
         url: 'https://data.riksdagen.se/personlista/',
     });
 
     const parsed: RemotePersonResponse = JSON.parse(response.body);
 
+    const currentPersons = await db.select<Person>('SELECT * from person');
+    const intressentIds = currentPersons.reduce((acc, person) => {
+        acc[person.intressent_id] = true;
+        return acc;
+    }, {} as Map<boolean>);
+
     for (const person of parsed.personlista.person) {
+        if (!person.intressent_id) {
+            continue;
+        }
+
+        //Only add new persons
+        if (intressentIds[person.intressent_id]) {
+            console.log(`SyncPersons: Person ${person.intressent_id} already added`);
+            continue;
+        }
+        console.log(`SyncPersons: Adding Person ${person.intressent_id}`);
+
         const p = new PersonModel({
             given_name: person.tilltalsnamn,
             family_name: person.efternamn,
@@ -32,4 +50,6 @@ export const SyncPersons: SyncAction<unknown> = async (db, http) => {
 
         await p.save();
     }
+
+    console.log('SyncPolls: done');
 };
