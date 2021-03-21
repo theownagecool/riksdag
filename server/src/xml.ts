@@ -44,7 +44,7 @@ export class XMLCallbackReader<Context> {
 
         parser.onclosetag = (name) => {
             const node = this.stack.pop();
-            if (name in this.callbacks) {
+            if (name in this.callbacks || name === '*') {
                 this.callbacks[name].call(undefined, node!, context);
             }
         };

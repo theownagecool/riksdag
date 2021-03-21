@@ -30,6 +30,7 @@ type ParseContext = {
     date: string;
     title: string;
     votes: Array<Vote>;
+    document_id: string;
 };
 
 function parseVote(answer: string) {
@@ -53,12 +54,19 @@ export const SyncPolls: SyncAction<unknown> = async (db, http) => {
     const ids = idResponse.body.split(',');
     const parser = new XMLCallbackReader<ParseContext>({
         dokument: (node, ctx) => {
+            //Title of the vote
             ctx.title = node.children.find((child) => child.name === 'titel')?.value ?? '';
+            //Date the vote took place
             ctx.date = node.children.find((child) => child.name === 'datum')?.value ?? '';
+            //Associate document, actual document stored elsewhere
+            ctx.document_id = node.children.find(child => child.name === 'dok_id')?.value ?? '';
         },
         votering: (node, ctx) => {
+            //Id of person who votes
             const intressentId = node.children.find((child) => child.name === 'intressent_id')?.value ?? '-1';
+            //Valence of vote
             const vote = node.children.find((child) => child.name === 'rost')?.value ?? '-1';
+
             const parsedVote = parseVote(vote);
             if (parsedVote !== null) {
                 ctx.votes.push({
@@ -88,12 +96,14 @@ export const SyncPolls: SyncAction<unknown> = async (db, http) => {
             date: '',
             title: '',
             votes: [],
+            document_id: ''
         });
 
         const poll = new PollModel({
             date: result?.date,
             title: result?.title,
             source_id: id,
+            document_id: result?.document_id
         });
 
         await poll.save();

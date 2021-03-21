@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS "person" (
 CREATE TABLE IF NOT EXISTS "poll" (
     "date" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    "source_id" TEXT PRIMARY KEY NOT NULL
+    "source_id" TEXT PRIMARY KEY NOT NULL,
+    "document_id" TEXT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS "vote" (
@@ -24,6 +25,19 @@ CREATE TABLE IF NOT EXISTS "vote" (
       ON UPDATE CASCADE
       ON DELETE CASCADE,
     FOREIGN KEY ("poll_id") REFERENCES "poll" ("source_id")
+      ON UPDATE CASCADE
+      ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS "document" (
+    "document_id" TEXT PRIMARY KEY NOT NULL,
+    "poll_id" TEXT NOT NULL,
+    "source" TEXT NOT NULL,
+    "source_id" TEXT NOT NULL,
+    "text" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    FOREIGN KEY ("document_id") REFERENCES "poll" ("document_id")
       ON UPDATE CASCADE
       ON DELETE CASCADE
 );

@@ -23,7 +23,7 @@ class SQLite3Statement<T extends any[]> implements Statement<SQLiteResult<T>> {
 
     public execute(params: any): Promise<SQLiteResult<T>> {
         return new Promise((resolve, reject) => {
-            this.fn.call(this.stmt, params, function (err, ...args) {
+            this.fn.call(this.stmt, params, function (err: any, ...args: T) {
                 if (err) {
                     reject(err);
                 } else {
@@ -39,7 +39,7 @@ class SQLite3Statement<T extends any[]> implements Statement<SQLiteResult<T>> {
                 if (err) {
                     reject(err);
                 } else {
-                    resolve();
+                    resolve(undefined);
                 }
             });
         });
