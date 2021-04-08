@@ -24,12 +24,10 @@ export const VoteModel = createModel('vote', 'vote_id', {
     answer: Field.number(),
 });
 
-export const DocumentModel = createModel('document', 'document_id', {
+export const DocumentModel = createModel('document', 'doc_id', {
     document_id: Field.string(),
     poll_id: Field.string(),
-    source: Field.string(),
-    source_id: Field.string(),
-    text: Field.string(),
+    type: Field.string(),
     title: Field.string(),
-    date: Field.string(),
+    decision_summary: Field.string(),
 });

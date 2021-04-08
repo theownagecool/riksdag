@@ -30,14 +30,10 @@ CREATE TABLE IF NOT EXISTS "vote" (
 );
 
 CREATE TABLE IF NOT EXISTS "document" (
-    "document_id" TEXT PRIMARY KEY NOT NULL,
+    "doc_id" INTEGER PRIMARY KEY NOT NULL,
+    "document_id" TEXT NOT NULL,
     "poll_id" TEXT NOT NULL,
-    "source" TEXT NOT NULL,
-    "source_id" TEXT NOT NULL,
-    "text" TEXT NOT NULL,
-    "date" TEXT NOT NULL,
+    "decision_summary" TEXT NOT NULL,
     "title" TEXT NOT NULL,
-    FOREIGN KEY ("document_id") REFERENCES "poll" ("document_id")
-      ON UPDATE CASCADE
-      ON DELETE CASCADE
+    "type" TEXT NOT NULL
 );
